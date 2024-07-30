@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Header from "@/components/ui/header";
+import Footer from "@/components/ui/footer";
+import { Toaster } from "react-hot-toast";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import SlotRenderer from "./SlotRenderer";
+import { ReactQueryProvider } from "@/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,12 +17,33 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  privateRoutes,
 }: Readonly<{
   children: React.ReactNode;
+  privateRoutes: React.ReactNode;
 }>) {
+  const defaultChildrenSlot = (
+    <ReactQueryProvider>
+      <div className="flex flex-col">
+        <ThemeProvider>
+          <Header />
+        </ThemeProvider>
+        {children}
+        <Footer />
+      </div>
+    </ReactQueryProvider>
+  );
+
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <SlotRenderer
+          privateSlot={privateRoutes}
+          defaultChildrenSlot={defaultChildrenSlot}
+        />
+
+        <Toaster position="top-right" />
+      </body>
     </html>
   );
 }
